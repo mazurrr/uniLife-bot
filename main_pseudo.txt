@@ -1,0 +1,315 @@
+from typing IMPORT List, Dict
+
+from assets IMPORT lang, keywords, config
+
+IMPORT csv
+
+IMPORT difflib
+
+
+
+
+
+DEFINE FUNCTION format_quickfix(data: List[List[str]]) -> List[List[str]]:
+
+    SET fixed_data: List[List[str]] TO []
+
+    FOR i IN data:
+
+        SET temp_list: List[str] TO []
+
+        FOR j IN i:
+
+            IF j[0] EQUALS " ":
+
+                temp_list.append(j[1:])
+
+            ELSE:
+
+                temp_list.append(j)
+
+        fixed_data.append(temp_list)
+
+    RETURN fixed_data
+
+
+
+
+
+DEFINE FUNCTION event_format(event: str) -> List[str]:
+
+    DEFINE FUNCTION replace_month(date):
+
+        SET months: Dict[str, str] TO {
+
+            "Jan": "January",
+
+            "Feb": "February",
+
+            "March": "March",
+
+            "April": "April",
+
+            "May": "May",
+
+            "Sep": "September",
+
+            "Oct": "October",
+
+            "Nov": "November",
+
+            "Dec": "December"
+
+        }
+
+        SET date_splitted TO date.split(' ')
+
+        RETURN f"{date_splitted[0]} {months[date_splitted[1]]}"
+
+
+
+    SET formatted_event: List[str] TO []
+
+    FOR event_index IN range(len(event)):
+
+        IF event[event_index] EQUALS "(":
+
+            formatted_event.append(event[0:event_index - 1])
+
+            formatted_event.append(replace_month(event[event_index + 1:-1]))
+
+    RETURN formatted_event
+
+
+
+
+
+DEFINE FUNCTION defineCategory(choice: str) -> str:
+
+    IF choice EQUALS config.END_KEYWORD:
+
+        RETURN "stop conversation"
+
+    SET best_score: float TO 0
+
+    SET best_score_category: str TO ""
+
+    FOR word IN keywords.keywords_sport:
+
+        SET seq TO difflib.SequenceMatcher(None, choice.lower(), word.lower())
+
+        IF config.DEBUG:
+
+            OUTPUT(f"[DEBUG] Similarity score ({choice} / {word} -> {seq.ratio() * 100}")
+
+        IF seq.ratio() * 100 > best_score:
+
+            SET best_score TO seq.ratio() * 100
+
+            SET best_score_category TO "sports"
+
+    FOR word IN keywords.keywords_studying:
+
+        SET seq TO difflib.SequenceMatcher(None, choice.lower(), word.lower())
+
+        IF config.DEBUG:
+
+            OUTPUT(f"[DEBUG] Similarity score ({choice} / {word} -> {seq.ratio() * 100}")
+
+        IF seq.ratio() * 100 > best_score:
+
+            SET best_score TO seq.ratio() * 100
+
+            SET best_score_category TO "studying"
+
+    FOR word IN keywords.keywords_social_activities:
+
+        SET seq TO difflib.SequenceMatcher(None, choice.lower(), word.lower())
+
+        IF config.DEBUG:
+
+            OUTPUT(f"[DEBUG] Similarity score ({choice} / {word} -> {seq.ratio() * 100}")
+
+        IF seq.ratio() * 100 > best_score:
+
+            SET best_score TO seq.ratio() * 100
+
+            SET best_score_category TO "social activities"
+
+    IF best_score > config.MIN_REQUIRED_SIMILARITY_SCORE:
+
+        RETURN best_score_category
+
+    ELSE:
+
+        SET best_score_category TO "not found"
+
+        RETURN best_score_category
+
+
+
+
+
+SET INPUT_data TO open("assets/unilife.csv", "r")
+
+SET formatted_data TO format_quickfix(list(csv.reader(INPUT_data, delimiter=",")))
+
+INPUT_data.close()
+
+
+
+SET data_sports: List[str] TO []
+
+SET data_associations: List[str] TO []
+
+SET data_events: List[List[str]] TO []
+
+
+
+FOR line IN formatted_data[1:]:
+
+    data_sports.append(line[0])
+
+    data_associations.append(line[1])
+
+    data_events.append(event_format(line[2]))
+
+
+
+SET conversation_status: bool TO True
+
+
+
+
+
+SET username: str TO INPUT(lang.REQUEST_NAME)
+
+OUTPUT(lang.GREETING.format(username=username))
+
+WHILE conversation_status:
+
+    SET is_struggling_correct: bool TO False
+
+    SET want_to_share_correct: bool TO False
+
+    SET has_specific_sport_correct: bool TO False
+
+    SET choice: str TO INPUT(lang.CHOOSE_TOPIC)
+
+    match defineCategory(choice):
+
+        case "studying":
+
+            IF config.DEBUG:
+
+                OUTPUT("[DEBUG] Category selected: Studying ")
+
+            WHILE not is_struggling_correct:
+
+                SET is_struggling: str TO INPUT(lang.IS_STRUGGLING)
+
+                IF is_struggling.lower() EQUALS "yes":
+
+                    SET is_struggling_correct TO True
+
+                    WHILE not want_to_share_correct:
+
+                        SET want_to_share: str TO INPUT(lang.WANT_TO_SHARE)
+
+                        IF want_to_share.lower() EQUALS "yes":
+
+                            SET want_to_share_correct TO True
+
+                            OUTPUT(lang.SUGGESTION_STUDY_GROUP)
+
+                            OUTPUT(lang.FINAL_ADNOTAION)
+
+                        ELSEIF want_to_share.lower() EQUALS "no":
+
+                            SET want_to_share_correct TO True
+
+                            OUTPUT(lang.SUGGESTION_STUDENT_ADVISOR)
+
+                            OUTPUT(lang.FINAL_ADNOTAION)
+
+                        ELSE:
+
+                            OUTPUT(lang.YES_NO_INCORRECT_RESPONSE.format(username=username))
+
+                ELSEIF is_struggling.lower() EQUALS "no":
+
+                    SET is_struggling_correct TO True
+
+                    OUTPUT(lang.SUGGESTION_STUDENT_DESK)
+
+                    OUTPUT(lang.FINAL_ADNOTAION)
+
+                ELSE:
+
+                    OUTPUT(lang.YES_NO_INCORRECT_RESPONSE.format(username=username))
+
+            OUTPUT(lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
+
+        case "sports":
+
+            IF config.DEBUG:
+
+                OUTPUT("[DEBUG] Category selected: Sports")
+
+            WHILE not has_specific_sport_correct:
+
+                SET has_specific_sport: str TO INPUT(lang.HAS_SPECIFIC_SPORT)
+
+                IF has_specific_sport.lower() EQUALS "yes":
+
+                    SET has_specific_sport_correct TO True
+
+                    SET user_sport: str TO INPUT(lang.QUESTION_SPECIFIC_SPORT)
+
+                    IF user_sport.lower() IN data_sports:
+
+                        OUTPUT(lang.SUGGESTION_SPORTS_CENTRE)
+
+                        OUTPUT(lang.FINAL_ADNOTAION)
+
+                    ELSE:
+
+                        OUTPUT(lang.SPORT_NOT_AVAILABLE)
+
+                        FOR i IN data_sports:
+
+                            OUTPUT(f"  -> {i}")
+
+                        OUTPUT(lang.FINAL_ADNOTAION)
+
+                ELSEIF has_specific_sport.lower() EQUALS "no":
+
+                    SET has_specific_sport_correct TO True
+
+                ELSE:
+
+                    OUTPUT(lang.YES_NO_INCORRECT_RESPONSE)
+
+
+
+            OUTPUT(lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
+
+        case "social activities":
+
+            IF config.DEBUG:
+
+                OUTPUT("[DEBUG] Category selected: Activities }")
+
+            OUTPUT(lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
+
+        case "not found":
+
+            OUTPUT(lang.CATEGORY_NOT_DEFINED.format(username=username))
+
+            OUTPUT(lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
+
+        case "stop conversation":
+
+            OUTPUT(lang.END_MESSAGE.format(username=username))
+
+            SET conversation_status TO False
