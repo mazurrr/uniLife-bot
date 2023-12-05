@@ -104,14 +104,14 @@ def upcomingEvents(events) -> None:
         event_date = event[1].split('-')
         difference = (date(int(event_date[0]), int(event_date[1]), int(event_date[2])) - current_date).days
         if difference > 0:
-            new_events_list.append([event[0], difference])
+            new_events_list.append([event[0], difference, event[1]])
     new_events_list.sort(key=lambda x: x[1])
     print(f"Upcoming events:")
     for event in range(1, 4):
         if new_events_list[event][1] == 1:
-            print(f"➫ {config.bot_message_special_format}{new_events_list[event][0]} {config.bot_message_format}will be held in {new_events_list[event][1]} day")
+            print(f"➫ {config.bot_message_special_format}{new_events_list[event][0]} {config.bot_message_format}will be held in {new_events_list[event][1]} day ({config.bot_message_date_highlight}{new_events_list[event][2]}{config.bot_message_format})")
         else:
-            print(f"➫ {config.bot_message_special_format}{new_events_list[event][0]} {config.bot_message_format}will be held in {new_events_list[event][1]} days")
+            print(f"➫ {config.bot_message_special_format}{new_events_list[event][0]} {config.bot_message_format}will be held in {new_events_list[event][1]} days ({config.bot_message_date_highlight}{new_events_list[event][2]}{config.bot_message_format})")
     return None
 
 
