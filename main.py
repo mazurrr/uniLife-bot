@@ -51,21 +51,21 @@ def defineCategory(user_input: str) -> str:
     for word in keywords.keywords_sport:
         seq = difflib.SequenceMatcher(None, user_input.lower(), word.lower())
         if config.DEBUG:
-            print(f"[DEBUG] Similarity score ({user_input} / {word} -> {seq.ratio() * 100}")
+            print(f"{config.bot_debug_format}[DEBUG] Similarity score ({user_input} / {word} -> {seq.ratio() * 100}")
         if seq.ratio() * 100 > best_score:
             best_score = seq.ratio() * 100
             best_score_category = "sports"
     for word in keywords.keywords_studying:
         seq = difflib.SequenceMatcher(None, user_input.lower(), word.lower())
         if config.DEBUG:
-            print(f"[DEBUG] Similarity score ({user_input} / {word} -> {seq.ratio() * 100}")
+            print(f"{config.bot_debug_format}[DEBUG] Similarity score ({user_input} / {word} -> {seq.ratio() * 100}")
         if seq.ratio() * 100 > best_score:
             best_score = seq.ratio() * 100
             best_score_category = "studying"
     for word in keywords.keywords_social_activities:
         seq = difflib.SequenceMatcher(None, user_input.lower(), word.lower())
         if config.DEBUG:
-            print(f"[DEBUG] Similarity score ({user_input} / {word} -> {seq.ratio() * 100}")
+            print(f"{config.bot_debug_format}[DEBUG] Similarity score ({user_input} / {word} -> {seq.ratio() * 100}")
         if seq.ratio() * 100 > best_score:
             best_score = seq.ratio() * 100
             best_score_category = "social activities"
@@ -76,7 +76,11 @@ def defineCategory(user_input: str) -> str:
         return best_score_category
 
 
-def defineAssociation(user_input: str) -> None:  # TODO
+def findAssociation(user_input: str) -> None:  # TODO
+    return None
+
+
+def findSport(user_input: str) -> None: # TODO
     return None
 
 
@@ -86,14 +90,15 @@ def upcomingEvents(events) -> None:
     for event in events:
         event_date = event[1].split('-')
         difference = (date(int(event_date[0]), int(event_date[1]), int(event_date[2])) - current_date).days
-        new_events_list.append([event[0], difference])
+        if difference > 0:
+            new_events_list.append([event[0], difference])
     new_events_list.sort(key=lambda x: x[1])
     print(f"Upcoming events:")
     for event in range(1, 4):
         if new_events_list[event][1] == 1:
-            print(f"- {new_events_list[event][0]} will be held in {new_events_list[event][1]} day")
+            print(f"➫ {config.bot_message_special_format}{new_events_list[event][0]} {config.bot_message_format}will be held in {new_events_list[event][1]} day")
         else:
-            print(f"- {new_events_list[event][0]} will be held in {new_events_list[event][1]} days")
+            print(f"➫ {config.bot_message_special_format}{new_events_list[event][0]} {config.bot_message_format}will be held in {new_events_list[event][1]} days")
     return None
 
 
@@ -111,83 +116,84 @@ for line in formatted_data[1:]:
     data_events.append(event_format(line[2]))
 
 conversation_status: bool = True
-
-username: str = input(lang.REQUEST_NAME)
-print(lang.GREETING.format(username=username))
+username: str = input(config.bot_message_format + lang.REQUEST_NAME)
+print(config.bot_message_format + lang.GREETING.format(username=username))
 while conversation_status:
     is_struggling_correct: bool = False
     want_to_share_correct: bool = False
     has_specific_sport_correct: bool = False
     user_activities_choice_correct: bool = False
-    choice: str = input(lang.CHOOSE_TOPIC)
+    choice: str = input(config.bot_message_format + lang.CHOOSE_TOPIC)
     match defineCategory(choice):
         case "studying":
             if config.DEBUG:
-                print("[DEBUG] Category selected: Studying ")
+                print(config.bot_debug_format + "[DEBUG] Category selected: Studying ")
             while not is_struggling_correct:
-                is_struggling: str = input(lang.IS_STRUGGLING)
+                is_struggling: str = input(config.bot_message_format + lang.IS_STRUGGLING)
                 if is_struggling.lower() == "yes":
                     is_struggling_correct = True
                     while not want_to_share_correct:
-                        want_to_share: str = input(lang.WANT_TO_SHARE)
+                        want_to_share: str = input(config.bot_message_format + lang.WANT_TO_SHARE)
                         if want_to_share.lower() == "yes":
                             want_to_share_correct = True
-                            print(lang.SUGGESTION_STUDY_GROUP)
-                            print(lang.FINAL_ADNOTAION)
+                            print(config.bot_message_format + lang.SUGGESTION_STUDY_GROUP)
+                            print(config.bot_message_format + lang.FINAL_ADNOTAION)
                         elif want_to_share.lower() == "no":
                             want_to_share_correct = True
-                            print(lang.SUGGESTION_STUDENT_ADVISOR)
-                            print(lang.FINAL_ADNOTAION)
+                            print(config.bot_message_format + lang.SUGGESTION_STUDENT_ADVISOR)
+                            print(config.bot_message_format + lang.FINAL_ADNOTAION)
                         else:
-                            print(lang.YES_NO_INCORRECT_RESPONSE.format(username=username))
+                            print(config.bot_message_error_cancel_format + lang.YES_NO_INCORRECT_RESPONSE.format(username=username))
                 elif is_struggling.lower() == "no":
                     is_struggling_correct = True
-                    print(lang.SUGGESTION_STUDENT_DESK)
-                    print(lang.FINAL_ADNOTAION)
+                    print(config.bot_message_format + lang.SUGGESTION_STUDENT_DESK)
+                    print(config.bot_message_format + lang.FINAL_ADNOTAION)
                 else:
-                    print(lang.YES_NO_INCORRECT_RESPONSE.format(username=username))
-            print(lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
+                    print(config.bot_message_error_cancel_format + lang.YES_NO_INCORRECT_RESPONSE.format(username=username))
+            print(config.bot_message_error_cancel_format + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
         case "sports":
             if config.DEBUG:
-                print("[DEBUG] Category selected: Sports")
+                print(config.bot_debug_format + "[DEBUG] Category selected: Sports")
             while not has_specific_sport_correct:
-                has_specific_sport: str = input(lang.HAS_SPECIFIC_SPORT)
+                has_specific_sport: str = input(config.bot_message_format + lang.HAS_SPECIFIC_SPORT)
                 if has_specific_sport.lower() == "yes":
                     has_specific_sport_correct = True
-                    user_sport: str = input(lang.QUESTION_SPECIFIC_SPORT)
+                    user_sport: str = input(config.bot_message_format + lang.QUESTION_SPECIFIC_SPORT)
                     if user_sport.lower() in data_sports:
-                        print(lang.SUGGESTION_SPORTS_CENTRE)
-                        print(lang.FINAL_ADNOTAION)
+                        print(config.bot_message_format + lang.SUGGESTION_SPORTS_CENTRE)
+                        print(config.bot_message_format + lang.FINAL_ADNOTAION)
                     else:
-                        print(lang.SPORT_NOT_AVAILABLE)
+                        print(config.bot_message_format + lang.SPORT_NOT_AVAILABLE)
                         for i in data_sports:
                             print(f"  -> {i}")
-                        print(lang.FINAL_ADNOTAION)
+                        print(config.bot_message_format + lang.FINAL_ADNOTAION)
                 elif has_specific_sport.lower() == "no":
                     has_specific_sport_correct = True
+                    sport_fit: str = input(config.bot_message_format + lang.SPORT_FIT)
+                    findSport(sport_fit)
                 else:
-                    print(lang.YES_NO_INCORRECT_RESPONSE)
+                    print(config.bot_message_format + lang.YES_NO_INCORRECT_RESPONSE)
 
-            print(lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
+            print(config.bot_message_error_cancel_format + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
         case "social activities":
             if config.DEBUG:
-                print("[DEBUG] Category selected: Activities }")
+                print(config.bot_debug_format + "[DEBUG] Category selected: Activities }")
             while not user_activities_choice_correct:
-                user_activities_choice: str = input(lang.EVENTS_OR_ASSOCIATIONS)
+                user_activities_choice: str = input(config.bot_message_format + lang.EVENTS_OR_ASSOCIATIONS)
                 if user_activities_choice.lower() == "events":
                     user_activities_choice_correct = True
                     upcomingEvents(data_events)
                 elif user_activities_choice.lower() == "associations":
                     user_activities_choice_correct = True
-                    association_fit: str = input(lang.ASSOCIATION_FIT)
-                    defineAssociation(association_fit)  # TODO
+                    association_fit: str = input(config.bot_message_format + lang.ASSOCIATION_FIT)
+                    findAssociation(association_fit)  # TODO
                 else:
-                    print(lang.EVENTS_OR_ASSOCIATIONS_ERROR)
+                    print(config.bot_message_error_cancel_format + lang.EVENTS_OR_ASSOCIATIONS_ERROR)
 
-            print(lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
+            print(config.bot_message_error_cancel_format + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
         case "not found":
-            print(lang.CATEGORY_NOT_DEFINED.format(username=username))
-            print(lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
+            print(config.bot_message_error_cancel_format + lang.CATEGORY_NOT_DEFINED.format(username=username))
+            print(config.bot_message_error_cancel_format + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
         case "stop conversation":
-            print(lang.END_MESSAGE.format(username=username))
+            print(config.bot_message_format + lang.END_MESSAGE.format(username=username))
             conversation_status = False
