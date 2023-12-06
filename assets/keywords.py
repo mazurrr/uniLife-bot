@@ -1,9 +1,9 @@
 from typing import List, Dict
 
-
 keywords_studying: List[str] = ["assignment", "task"]
 keywords_sport: List[str] = ["sport", "football", "basketball", "sport opportunities", "team"]
-keywords_social_activities: List[str] = ["social", "social activities", "student association", "events", "upcoming events", "upcoming social events", "social events"]
+keywords_social_activities: List[str] = ["social", "social activities", "student association", "events",
+                                         "upcoming events", "upcoming social events", "social events"]
 sport_keywords: Dict[str, List[str]] = {
     "aikido": [],
     "basketball": [],
@@ -15,7 +15,20 @@ sport_keywords: Dict[str, List[str]] = {
     "yoga": [],
     "waterpolo": []
 }
+association_keywords: Dict[str, List[str]] = {
+    "Poetry Pals": [],
+    "Debate Club": [],
+    "Science Society": [],
+    "Painting and Pottery": [],
+    "Language Club": [],
+    "International Students Society": [],
+    "Students for Sustainability": [],
+    "Animal Shelter Volunteers": [],
+    "Bunch of Backpackers": []
+}
 
-redundant_words: List[str] = ["the", "and", "why", "what", "where", "who", "when", "how", "because", "if", "this", "that", "there", 
-                   "than", "then", "however", "maybe", "some", "to", "from", "back", "more", "less", "better", "worse",
-                   "else", "please", "help"]
+redundant_words: List[str] = ["the", "and", "why", "what", "where", "who", "when", "how", "because", "if", "this",
+                              "that", "there",
+                              "than", "then", "however", "maybe", "some", "to", "from", "back", "more", "less",
+                              "better", "worse",
+                              "else", "please", "help"]

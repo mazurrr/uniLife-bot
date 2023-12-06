@@ -19,3 +19,5 @@ EVENTS_OR_ASSOCIATIONS: str = "Ohh.. so you're a type of a social guy huh? \nI'v
 EVENTS_OR_ASSOCIATIONS_ERROR: str = "\n{username}!\nIf you want me to help I need you to answer EVENTS or ASSOCIATIONS!\n"
 ASSOCIATION_FIT: str = "What kind of association would suit you the best? Try to explain it in 1 word"
 SPORT_FIT: str = "What kind of association would suit you the best? Try to explain it in 1 word"
+
+SIMILARITY_SCORE_DEBUG: str = "[DEBUG] Similarity score ({user_input} / {word} -> {calc}"

@@ -56,6 +56,21 @@ def event_format(event: str) -> List[str]:  # Christmas Dinner (18 Dec)
     return formatted_event
 
 
+def formatUserInput(user_input: str) -> str:
+    user_input_splitted: List[str] = user_input.split(' ')
+    final_output: str = ""
+    for word in user_input_splitted:
+        if word.lower() in keywords.redundant_words:
+            user_input_splitted.pop(user_input_splitted.index(word))
+    for word_index in range(len(user_input_splitted)):
+        if word_index == len(user_input_splitted) - 1:
+            final_output += f"{user_input_splitted[word_index]}"
+        else:
+            final_output += f"{user_input_splitted[word_index]} "
+
+    return final_output
+
+
 def defineCategory(user_input: str) -> str:
     if user_input == config.END_KEYWORD:
         return "stop conversation"
@@ -64,7 +79,8 @@ def defineCategory(user_input: str) -> str:
     for word in keywords.keywords_sport:
         seq = difflib.SequenceMatcher(None, user_input.lower(), word.lower())
         if config.DEBUG:
-            print(f"{config.bot_debug_format}[DEBUG] Similarity score ({user_input} / {word} -> {seq.ratio() * 100}")
+            print(config.bot_debug_format + lang.SIMILARITY_SCORE_DEBUG.format(user_input=user_input, word=word,
+                                                                               calc=seq.ratio() * 100))
         if seq.ratio() * 100 > best_score:
             best_score = seq.ratio() * 100
             best_score_category = "sports"
@@ -93,7 +109,7 @@ def findAssociation(user_input: str) -> None:  # TODO
     return None
 
 
-def findSport(user_input: str) -> None: # TODO
+def findSport(user_input: str) -> None:  # TODO
     return None
 
 
@@ -109,9 +125,11 @@ def upcomingEvents(events) -> None:
     print(f"Upcoming events:")
     for event in range(1, 4):
         if new_events_list[event][1] == 1:
-            print(f"➫ {config.bot_message_special_format}{new_events_list[event][0]} {config.bot_message_format}will be held in {new_events_list[event][1]} day ({config.bot_message_date_highlight}{new_events_list[event][2]}{config.bot_message_format})")
+            print(
+                f"➫ {config.bot_message_special_format}{new_events_list[event][0]} {config.bot_message_format}will be held in {new_events_list[event][1]} day ({config.bot_message_date_highlight}{new_events_list[event][2]}{config.bot_message_format})")
         else:
-            print(f"➫ {config.bot_message_special_format}{new_events_list[event][0]} {config.bot_message_format}will be held in {new_events_list[event][1]} days ({config.bot_message_date_highlight}{new_events_list[event][2]}{config.bot_message_format})")
+            print(
+                f"➫ {config.bot_message_special_format}{new_events_list[event][0]} {config.bot_message_format}will be held in {new_events_list[event][1]} days ({config.bot_message_date_highlight}{new_events_list[event][2]}{config.bot_message_format})")
     return None
 
 
@@ -136,8 +154,10 @@ while conversation_status:
     want_to_share_correct: bool = False
     has_specific_sport_correct: bool = False
     user_activities_choice_correct: bool = False
-    choice: str = input(config.bot_message_format + lang.CHOOSE_TOPIC)
-    match defineCategory(choice):
+    user_input: str = input(config.bot_message_format + lang.CHOOSE_TOPIC)
+    if config.DEBUG:
+        print(config.bot_debug_format + f"[DEBUG] Formatted user input: {formatUserInput(user_input)}")
+    match defineCategory(formatUserInput(user_input)):
         case "studying":
             if config.DEBUG:
                 print(config.bot_debug_format + "[DEBUG] Category selected: Studying ")
@@ -156,13 +176,15 @@ while conversation_status:
                             print(config.bot_message_format + lang.SUGGESTION_STUDENT_ADVISOR)
                             print(config.bot_message_format + lang.FINAL_ADNOTAION)
                         else:
-                            print(config.bot_message_error_cancel_format + lang.YES_NO_INCORRECT_RESPONSE.format(username=username))
+                            print(config.bot_message_error_cancel_format + lang.YES_NO_INCORRECT_RESPONSE.format(
+                                username=username))
                 elif is_struggling.lower() == "no":
                     is_struggling_correct = True
                     print(config.bot_message_format + lang.SUGGESTION_STUDENT_DESK)
                     print(config.bot_message_format + lang.FINAL_ADNOTAION)
                 else:
-                    print(config.bot_message_error_cancel_format + lang.YES_NO_INCORRECT_RESPONSE.format(username=username))
+                    print(config.bot_message_error_cancel_format + lang.YES_NO_INCORRECT_RESPONSE.format(
+                        username=username))
             print(config.bot_message_error_cancel_format + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
         case "sports":
             if config.DEBUG:
