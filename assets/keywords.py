@@ -16,15 +16,15 @@ sport_keywords: Dict[str, List[str]] = {
     "waterpolo": []
 }
 association_keywords: Dict[str, List[str]] = {
-    "Poetry Pals": [],
-    "Debate Club": [],
-    "Science Society": [],
-    "Painting and Pottery": [],
-    "Language Club": [],
-    "International Students Society": [],
-    "Students for Sustainability": [],
-    "Animal Shelter Volunteers": [],
-    "Bunch of Backpackers": []
+    "Poetry Pals": ["lorem ipsum"],
+    "Debate Club": ["lorem ipsum"],
+    "Science Society": ["lorem ipsum"],
+    "Painting and Pottery": ["lorem ipsum"],
+    "Language Club": ["lorem ipsum"],
+    "International Students Society": ["lorem ipsum"],
+    "Students for Sustainability": ["lorem ipsum"],
+    "Animal Shelter Volunteers": ["animals", "help", "volounteering"],
+    "Bunch of Backpackers": ["lorem ipsum"]
 }
 
 redundant_words: List[str] = ["the", "and", "why", "what", "where", "who", "when", "how", "because", "if", "this",

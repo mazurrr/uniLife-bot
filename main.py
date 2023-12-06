@@ -105,8 +105,48 @@ def defineCategory(user_input: str) -> str:
         return best_score_category
 
 
-def findAssociation(user_input: str) -> None:  # TODO
-    return None
+def findAssociation(user_input: str) -> List[str]:  # TODO
+    user_input_splitted = user_input.split(' ')
+    associations_scores: Dict[str, float] = {}
+    final_suggestions: List[str] = []
+
+    def calcAssociationMatchScore(user_input: List[str], association: str) -> None:
+        all_word_scores: List[float] = []
+        for word in user_input:
+            word_score: float = 0
+            for association_keyword in keywords.association_keywords[association]:
+                seq = difflib.SequenceMatcher(None, word.lower(), association_keyword.lower())
+                if config.DEBUG:
+                    print(
+                        f"{config.bot_debug_format}[DEBUG] Similarity score ({word.lower()} / {association_keyword.lower()} -> {seq.ratio() * 100}")
+                if seq.ratio() * 100 > word_score:
+                    word_score = seq.ratio() * 100
+            if word_score > config.MIN_REQ_SIM_SCORE_ASSOCIATIONS_WORD_MATCH:
+                all_word_scores.append(word_score)
+        match_score: float = 0
+        for word_score in all_word_scores:
+            match_score += word_score
+        if len(all_word_scores) == 0:
+            associations_scores[association] = 0
+        else:
+            match_score = match_score / len(all_word_scores)
+            associations_scores[association] = match_score
+
+    for association in keywords.association_keywords.keys():
+        calcAssociationMatchScore(user_input_splitted, association)
+
+    for association in associations_scores.items():
+        if association[1] > config.MIN_REQ_SIM_SCORE_ASSOCIATIONS_FINAL_MATCH:
+            final_suggestions.append(association[0])
+
+    if len(final_suggestions) > 0:
+        print("\nYou should consider joining the following associations: \n")
+        for association in final_suggestions:
+            print(f"-> {association}")
+        print('\n')
+        print(config.bot_message_format + lang.FINAL_ADNOTAION)
+    else:
+        print("Unfortunately we didn't manage to find a right fit for you!")
 
 
 def findSport(user_input: str) -> None:  # TODO
@@ -115,7 +155,7 @@ def findSport(user_input: str) -> None:  # TODO
 
 def upcomingEvents(events) -> None:
     current_date = date.today()
-    new_events_list: List[List[str, int]] = []
+    new_events_list: List[List[int | any]] = []
     for event in events:
         event_date = event[1].split('-')
         difference = (date(int(event_date[0]), int(event_date[1]), int(event_date[2])) - current_date).days

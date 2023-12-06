@@ -17,7 +17,7 @@ HAS_SPECIFIC_SPORT: str = "Do you have specific sport in mind?"
 QUESTION_SPECIFIC_SPORT: str = "Which sport do you have in mind?"
 EVENTS_OR_ASSOCIATIONS: str = "Ohh.. so you're a type of a social guy huh? \nI've got some cool info about upcoming events!\nOr maybe you would like to join a student association?\nIt's totally up to you but you need but you need to let me know what you prefer!\n\nIf events: type events, otherwise type associations\n\nYour answer: "
 EVENTS_OR_ASSOCIATIONS_ERROR: str = "\n{username}!\nIf you want me to help I need you to answer EVENTS or ASSOCIATIONS!\n"
-ASSOCIATION_FIT: str = "What kind of association would suit you the best? Try to explain it in 1 word"
+ASSOCIATION_FIT: str = "What kind of association would suit you the best? What would you like to do?"
 SPORT_FIT: str = "What kind of association would suit you the best? Try to explain it in 1 word"
 
 SIMILARITY_SCORE_DEBUG: str = "[DEBUG] Similarity score ({user_input} / {word} -> {calc}"
