@@ -15,3 +15,7 @@ sport_keywords: Dict[str, List[str]] = {
     "yoga": [],
     "waterpolo": []
 }
+
+redundant_words: List[str] = ["the", "and", "why", "what", "where", "who", "when", "how", "because", "if", "this", "that", "there", 
+                   "than", "then", "however", "maybe", "some", "to", "from", "back", "more", "less", "better", "worse",
+                   "else", "please", "help"]
