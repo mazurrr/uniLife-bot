@@ -27,8 +27,4 @@ association_keywords: Dict[str, List[str]] = {
     "Bunch of Backpackers": ["lorem ipsum"]
 }
 
-redundant_words: List[str] = ["the", "and", "why", "what", "where", "who", "when", "how", "because", "if", "this",
-                              "that", "there",
-                              "than", "then", "however", "maybe", "some", "to", "from", "back", "more", "less",
-                              "better", "worse",
-                              "else", "please", "help"]
+redundant_words: List[str] = ["we", "the", "and", "why", "what", "where", "who", "when", "how", "because", "if", "this", "that", "there", "than", "then", "however", "maybe", "some", "to", "from", "back", "more", "less", "better", "worse", "else", "please", "help", "do", "you", "many", "question", "questions", "we", "have", "any", "at", "our", "university"]

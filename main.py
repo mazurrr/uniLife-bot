@@ -57,18 +57,25 @@ def event_format(event: str) -> List[str]:  # Christmas Dinner (18 Dec)
 
 
 def formatUserInput(user_input: str) -> str:
-    user_input_splitted: List[str] = user_input.split(' ')
-    final_output: str = ""
-    for word in user_input_splitted:
-        if word.lower() in keywords.redundant_words:
-            user_input_splitted.pop(user_input_splitted.index(word))
-    for word_index in range(len(user_input_splitted)):
-        if word_index == len(user_input_splitted) - 1:
-            final_output += f"{user_input_splitted[word_index]}"
-        else:
-            final_output += f"{user_input_splitted[word_index]} "
+    blacklisted_signs: List[str] = config.USER_INPUT_BLACKLISTED_SIGNS
 
-    return final_output
+    for sign in blacklisted_signs:
+        user_input = user_input.replace(sign, "")
+
+    splitted_input: List[str] = user_input.split()
+    working_input: List[str] = splitted_input.copy()
+    output: str = ""
+
+    for word in splitted_input:
+        if word.lower() in keywords.redundant_words:
+            working_input.remove(word)
+
+    for word_index in range(len(working_input)):
+        if word_index == len(working_input)-1:
+            output += f"{working_input[word_index]}"
+        else:
+            output += f"{working_input[word_index]} "
+    return output
 
 
 def defineCategory(user_input: str) -> str:
@@ -105,7 +112,7 @@ def defineCategory(user_input: str) -> str:
         return best_score_category
 
 
-def findAssociation(user_input: str) -> List[str]:  # TODO
+def findAssociation(user_input: str) -> None:
     user_input_splitted = user_input.split(' ')
     associations_scores: Dict[str, float] = {}
     final_suggestions: List[str] = []
