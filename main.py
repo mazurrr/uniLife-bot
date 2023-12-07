@@ -147,13 +147,14 @@ def findAssociation(user_input: str) -> None:
             final_suggestions.append(association[0])
 
     if len(final_suggestions) > 0:
-        print("\nYou should consider joining the following associations: \n")
+        print(f"\n{config.bot_message_format}You should consider joining the following associations: \n")
         for association in final_suggestions:
-            print(f"-> {association}")
-        print('\n')
+            print(f"{config.bot_message_format}➫ {config.bot_message_special_format}{association}")
         print(config.bot_message_format + lang.FINAL_ADNOTAION)
     else:
-        print("Unfortunately we didn't manage to find a right fit for you!")
+        print(config.bot_message_format + lang.ASSOCIATION_MATCH_NOT_FOUND)
+        for association in data_associations:
+            print(f"{config.bot_message_format}➫ {config.bot_message_special_format}{association}{config.bot_message_format}")
 
 
 def findSport(user_input: str) -> None:  # TODO
@@ -254,7 +255,7 @@ while conversation_status:
                     sport_fit: str = input(config.bot_message_format + lang.SPORT_FIT)
                     findSport(sport_fit)
                 else:
-                    print(config.bot_message_format + lang.YES_NO_INCORRECT_RESPONSE)
+                    print(config.bot_message_format + lang.YES_NO_INCORRECT_RESPONSE.format(username=username))
 
             print(config.bot_message_error_cancel_format + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
         case "social activities":
@@ -268,9 +269,9 @@ while conversation_status:
                 elif user_activities_choice.lower() == "associations":
                     user_activities_choice_correct = True
                     association_fit: str = input(config.bot_message_format + lang.ASSOCIATION_FIT)
-                    findAssociation(association_fit)  # TODO
+                    findAssociation(formatUserInput(association_fit))
                 else:
-                    print(config.bot_message_error_cancel_format + lang.EVENTS_OR_ASSOCIATIONS_ERROR)
+                    print(config.bot_message_error_cancel_format + lang.EVENTS_OR_ASSOCIATIONS_ERROR.format(username=username))
 
             print(config.bot_message_error_cancel_format + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
         case "not found":
