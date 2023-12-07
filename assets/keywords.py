@@ -1,9 +1,32 @@
 from typing import List, Dict
 
 keywords_studying: List[str] = ["assignment", "task"]
-keywords_sport: List[str] = ["sport", "football", "basketball", "sport opportunities", "team"]
-keywords_social_activities: List[str] = ["social", "social activities", "student association", "events",
-                                         "upcoming events", "upcoming social events", "social events"]
+
+match_keywords = {
+    "sports": {
+        "aikido": ["aikido", "sport"],
+        "basketball": ["basketball", "teamsport"],
+        "tennis": ["tennis"],
+        "swimming": ["swimming"],
+        "football": ["football"],
+        "zumba": ["zumba"],
+        "karate": ["karate"],
+        "yoga": ["yoga"],
+        "waterpolo": ["waterpolo"],
+    },
+    "associations": {
+        "Poetry Pals": ["art", "poetry"],
+        "Debate Club": ["debate"],
+        "Science Society": ["science"],
+        "Painting and Pottery": ["arts", "art", "painting", "pottery"],
+        "Language Club": ["language", "culture", "international"],
+        "International Students Society": ["international", "erasmus"],
+        "Students for Sustainability": ["sustainability", "environment"],
+        "Animal Shelter Volunteers": ["animals", "help", "volounteering"],
+        "Bunch of Backpackers": ["nature, backpackers", "backpacking", "travel", "travelling", "environment"]
+    }
+}
+
 sport_keywords: Dict[str, List[str]] = {
     "aikido": [],
     "basketball": [],

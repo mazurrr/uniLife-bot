@@ -71,7 +71,7 @@ def formatUserInput(user_input: str) -> str:
             working_input.remove(word)
 
     for word_index in range(len(working_input)):
-        if word_index == len(working_input)-1:
+        if word_index == len(working_input) - 1:
             output += f"{working_input[word_index]}"
         else:
             output += f"{working_input[word_index]} "
@@ -112,53 +112,50 @@ def defineCategory(user_input: str) -> str:
         return best_score_category
 
 
-def findAssociation(user_input: str) -> None:
-    user_input_splitted = user_input.split(' ')
-    associations_scores: Dict[str, float] = {}
+def findBestMatch(user_input: str, type: str) -> None:
+    user_input_splitted = user_input.split()
+    all_scores: Dict[str, float] = {}
     final_suggestions: List[str] = []
 
-    def calcAssociationMatchScore(user_input: List[str], association: str) -> None:
-        all_word_scores: List[float] = []
+    def calcMatchScore(user_input: List[str], type: str, target: str) -> None:
+        all_words_scores: List[float] = []
         for word in user_input:
             word_score: float = 0
-            for association_keyword in keywords.association_keywords[association]:
-                seq = difflib.SequenceMatcher(None, word.lower(), association_keyword.lower())
+            for keyword in keywords.match_keywords[type][target]:
+                seq = difflib.SequenceMatcher(None, word.lower(), keyword.lower())
                 if config.DEBUG:
                     print(
-                        f"{config.bot_debug_format}[DEBUG] Similarity score ({word.lower()} / {association_keyword.lower()} -> {seq.ratio() * 100}")
+                        f"{config.bot_debug_format}[DEBUG] Similarity score ({word.lower()} / {keyword.lower()} -> {seq.ratio() * 100}")
                 if seq.ratio() * 100 > word_score:
                     word_score = seq.ratio() * 100
-            if word_score > config.MIN_REQ_SIM_SCORE_ASSOCIATIONS_WORD_MATCH:
-                all_word_scores.append(word_score)
+            if word_score > config.MIN_REQ_SIM_SCORE_MATCH[type]:
+                all_words_scores.append(word_score)
         match_score: float = 0
-        for word_score in all_word_scores:
-            match_score += word_score
-        if len(all_word_scores) == 0:
-            associations_scores[association] = 0
-        else:
-            match_score = match_score / len(all_word_scores)
-            associations_scores[association] = match_score
+        for score in all_words_scores:
+            match_score += score
+        try:
+            match_score = match_score / len(all_words_scores)
+            all_scores[target] = match_score
+        except:
+            all_scores[target] = 0
 
-    for association in keywords.association_keywords.keys():
-        calcAssociationMatchScore(user_input_splitted, association)
+    for item in keywords.match_keywords[type]:
+        calcMatchScore(user_input_splitted, type, item)
 
-    for association in associations_scores.items():
-        if association[1] > config.MIN_REQ_SIM_SCORE_ASSOCIATIONS_FINAL_MATCH:
-            final_suggestions.append(association[0])
-
+    for item in all_scores.items():
+        if item[1] > config.MIN_REQ_SIM_SCORE_FINAL_MATCH[type]:
+            final_suggestions.append(item[0])
     if len(final_suggestions) > 0:
-        print(f"\n{config.bot_message_format}You should consider joining the following associations: \n")
-        for association in final_suggestions:
-            print(f"{config.bot_message_format}➫ {config.bot_message_special_format}{association}")
+        print(f"{config.bot_message_format}{type.capitalize()} we managed to find for you:")
+        for suggestion in final_suggestions:
+            print(f"{config.bot_message_format}➫ {config.bot_message_special_format}{suggestion}{config.bot_message_format}")
         print(config.bot_message_format + lang.FINAL_ADNOTAION)
     else:
-        print(config.bot_message_format + lang.ASSOCIATION_MATCH_NOT_FOUND)
-        for association in data_associations:
-            print(f"{config.bot_message_format}➫ {config.bot_message_special_format}{association}{config.bot_message_format}")
-
-
-def findSport(user_input: str) -> None:  # TODO
-    return None
+        match type:
+            case "associations":
+                print(config.bot_message_format + lang.ASSOCIATION_MATCH_NOT_FOUND)
+            case "sports":
+                print(config.bot_message_format + lang.SPORT_MATCH_NOT_FOUND)
 
 
 def upcomingEvents(events) -> None:
@@ -197,6 +194,7 @@ print(utils.Color.YELLOW + utils.greeting_title)
 conversation_status: bool = True
 username: str = input(config.bot_message_format + lang.REQUEST_NAME)
 print(config.bot_message_format + lang.GREETING.format(username=username))
+
 while conversation_status:
     is_struggling_correct: bool = False
     want_to_share_correct: bool = False
@@ -253,7 +251,7 @@ while conversation_status:
                 elif has_specific_sport.lower() == "no":
                     has_specific_sport_correct = True
                     sport_fit: str = input(config.bot_message_format + lang.SPORT_FIT)
-                    findSport(sport_fit)
+                    findBestMatch(formatUserInput(sport_fit), "sports")
                 else:
                     print(config.bot_message_format + lang.YES_NO_INCORRECT_RESPONSE.format(username=username))
 
@@ -269,9 +267,10 @@ while conversation_status:
                 elif user_activities_choice.lower() == "associations":
                     user_activities_choice_correct = True
                     association_fit: str = input(config.bot_message_format + lang.ASSOCIATION_FIT)
-                    findAssociation(formatUserInput(association_fit))
+                    findBestMatch(formatUserInput(association_fit), "associations")
                 else:
-                    print(config.bot_message_error_cancel_format + lang.EVENTS_OR_ASSOCIATIONS_ERROR.format(username=username))
+                    print(config.bot_message_error_cancel_format + lang.EVENTS_OR_ASSOCIATIONS_ERROR.format(
+                        username=username))
 
             print(config.bot_message_error_cancel_format + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
         case "not found":

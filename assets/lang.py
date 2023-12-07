@@ -18,6 +18,7 @@ QUESTION_SPECIFIC_SPORT: str = "\nWhich sport do you have in mind?\n\nYour answe
 EVENTS_OR_ASSOCIATIONS: str = "\nOhh.. so you're a type of a social guy huh? \nI've got some cool info about upcoming events!\nOr maybe you would like to join a student association?\nIt's totally up to you but you need but you need to let me know what you prefer!\n\nIf events: type events, otherwise type associations\n\nYour answer: "
 EVENTS_OR_ASSOCIATIONS_ERROR: str = "\n{username}!\nIf you want me to help I need you to answer EVENTS or ASSOCIATIONS!\n"
 ASSOCIATION_MATCH_NOT_FOUND: str = "\nI'm so sorry {username} but I couldn't find a right fit for you!\nYou have to take into consideration the fact that I'm just a robot and I might make mistakes sometimes. \nThat's why I would like to provide you with a list containing all students associations. \nMaybe you could find something for yourself huh?"
+SPORT_MATCH_NOT_FOUND: str = "\nI'm so sorry {username} but I couldn't find a right fit for you!\nYou have to take into consideration the fact that I'm just a robot and I might make mistakes sometimes. \nThat's why I would like to provide you with a list containing all sports available at our university. \nMaybe you could find something for yourself huh?"
 ASSOCIATION_FIT: str = "\nWhat kind of association would suit you the best? What would you like to do?\n\nYour answer: "
 SPORT_FIT: str = "\nWhat kind of association would suit you the best?\n\nYour answer: "
 
