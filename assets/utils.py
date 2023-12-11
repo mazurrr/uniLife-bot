@@ -26,10 +26,10 @@ class Color:
 def send_msg(msg_type: str, content: str) -> None:
     match msg_type:
         case "default":
-            print(f"{config.bot_message_format}{content}")
+            print(f"{config.message}{content}")
         case "error":
-            print(f"{config.bot_message_error_cancel_format}{content}")
+            print(f"{config.error}{content}")
         case "debug":
-            print(f"{config.bot_debug_format}{content}")
+            print(f"{config.debug}{content}")
         case "highlight":
             print("elo")

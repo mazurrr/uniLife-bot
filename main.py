@@ -20,13 +20,13 @@ from datetime import date
 
 def format_quickfix(data: List[List[str]]) -> List[List[str]]:
     fixed_data: List[List[str]] = []
-    for i in data:
+    for line in data:
         temp_list: List[str] = []
-        for j in i:
-            if j[0] == " ":
-                temp_list.append(j[1:])
+        for word in line:
+            if word[0] == " ":
+                temp_list.append(word[1:])
             else:
-                temp_list.append(j)
+                temp_list.append(word)
         fixed_data.append(temp_list)
     return fixed_data
 
@@ -87,7 +87,7 @@ def defineCategory(user_input: str) -> str:
         for word in keywords.categoryMatchKeywords[category]:
             seq = difflib.SequenceMatcher(None, user_input.lower(), word.lower())
             if config.DEBUG:
-                print(config.bot_debug_format + lang.SIMILARITY_SCORE_DEBUG.format(user_input=user_input, word=word, calc=seq.ratio() * 100))
+                print(config.debug + lang.SIMILARITY_SCORE_DEBUG.format(user_input=user_input, word=word, calc=seq.ratio() * 100))
             if seq.ratio() * 100 > best_score:
                 best_score = seq.ratio() * 100
                 best_score_category = category
@@ -112,7 +112,7 @@ def findBestMatch(user_input: str, category: str) -> None:
                 seq = difflib.SequenceMatcher(None, word.lower(), keyword.lower())
                 if config.DEBUG:
                     print(
-                        f"{config.bot_debug_format}[DEBUG] Similarity score ({word.lower()} / {keyword.lower()} -> {seq.ratio() * 100}")
+                        f"{config.debug}[DEBUG] Similarity score ({word.lower()} / {keyword.lower()} -> {seq.ratio() * 100}")
                 if seq.ratio() * 100 > word_score:
                     word_score = seq.ratio() * 100
             if word_score > config.MIN_REQ_SIM_SCORE_MATCH[category]:
@@ -133,17 +133,17 @@ def findBestMatch(user_input: str, category: str) -> None:
         if item[1] > config.MIN_REQ_SIM_SCORE_FINAL_MATCH[category]:
             final_suggestions.append(item[0])
     if len(final_suggestions) > 0:
-        print(f"{config.bot_message_format}{category.capitalize()} we managed to find for you:")
+        print(f"{config.message}{category.capitalize()} we managed to find for you:")
         for suggestion in final_suggestions:
             print(
-                f"{config.bot_message_format}➫ {config.bot_message_special_format}{suggestion}{config.bot_message_format}")
-        print(config.bot_message_format + lang.FINAL_ADNOTAION)
+                f"{config.message}➫ {config.special}{suggestion}{config.message}")
+        print(config.message + lang.FINAL_ADNOTAION)
     else:
         match category:
             case "associations":
-                print(config.bot_message_format + lang.ASSOCIATION_MATCH_NOT_FOUND)
+                print(config.message + lang.ASSOCIATION_MATCH_NOT_FOUND)
             case "sports":
-                print(config.bot_message_format + lang.SPORT_MATCH_NOT_FOUND)
+                print(config.message + lang.SPORT_MATCH_NOT_FOUND)
 
 
 def upcomingEvents(events) -> None:
@@ -159,11 +159,10 @@ def upcomingEvents(events) -> None:
     for event in range(1, 4):
         if new_events_list[event][1] == 1:
             print(
-                f"➫ {config.bot_message_special_format}{new_events_list[event][0]} {config.bot_message_format}will be held in {new_events_list[event][1]} day ({config.bot_message_date_highlight}{new_events_list[event][2]}{config.bot_message_format})")
+                f"➫ {config.special}{new_events_list[event][0]} {config.message}will be held in {new_events_list[event][1]} day ({config.highlight}{new_events_list[event][2]}{config.message})")
         else:
             print(
-                f"➫ {config.bot_message_special_format}{new_events_list[event][0]} {config.bot_message_format}will be held in {new_events_list[event][1]} days ({config.bot_message_date_highlight}{new_events_list[event][2]}{config.bot_message_format})")
-    return None
+                f"➫ {config.special}{new_events_list[event][0]} {config.message}will be held in {new_events_list[event][1]} days ({config.highlight}{new_events_list[event][2]}{config.message})")
 
 
 input_data = open("assets/unilife.csv", "r")
@@ -181,90 +180,90 @@ for line in formatted_data[1:]:
 
 print(utils.Color.YELLOW + utils.greeting_title)
 conversation_status: bool = True
-username: str = input(config.bot_message_format + lang.REQUEST_NAME)
-print(config.bot_message_format + lang.GREETING.format(username=username))
+username: str = input(config.message + lang.REQUEST_NAME)
+print(config.message + lang.GREETING.format(username=username))
 
 while conversation_status:
     is_struggling_correct: bool = False
     want_to_share_correct: bool = False
     has_specific_sport_correct: bool = False
     user_activities_choice_correct: bool = False
-    user_input: str = input(config.bot_message_format + lang.CHOOSE_TOPIC)
+    user_input: str = input(config.message + lang.CHOOSE_TOPIC)
     if config.DEBUG:
-        print(config.bot_debug_format + f"[DEBUG] Formatted user input: {formatUserInput(user_input)}")
+        print(config.debug + f"[DEBUG] Formatted user input: {formatUserInput(user_input)}")
     match defineCategory(formatUserInput(user_input)):
         case "studying":
             if config.DEBUG:
-                print(config.bot_debug_format + "[DEBUG] Category selected: Studying ")
+                print(config.debug + "[DEBUG] Category selected: Studying ")
             while not is_struggling_correct:
-                is_struggling: str = input(config.bot_message_format + lang.IS_STRUGGLING)
+                is_struggling: str = input(config.message + lang.IS_STRUGGLING)
                 if is_struggling.lower() == "yes":
                     is_struggling_correct = True
                     while not want_to_share_correct:
-                        want_to_share: str = input(config.bot_message_format + lang.WANT_TO_SHARE)
+                        want_to_share: str = input(config.message + lang.WANT_TO_SHARE)
                         if want_to_share.lower() == "yes":
                             want_to_share_correct = True
-                            print(config.bot_message_format + lang.SUGGESTION_STUDY_GROUP)
-                            print(config.bot_message_format + lang.FINAL_ADNOTAION)
+                            print(config.message + lang.SUGGESTION_STUDY_GROUP)
+                            print(config.message + lang.FINAL_ADNOTAION)
                         elif want_to_share.lower() == "no":
                             want_to_share_correct = True
-                            print(config.bot_message_format + lang.SUGGESTION_STUDENT_ADVISOR)
-                            print(config.bot_message_format + lang.FINAL_ADNOTAION)
+                            print(config.message + lang.SUGGESTION_STUDENT_ADVISOR)
+                            print(config.message + lang.FINAL_ADNOTAION)
                         else:
-                            print(config.bot_message_error_cancel_format + lang.YES_NO_INCORRECT_RESPONSE.format(
+                            print(config.error + lang.YES_NO_INCORRECT_RESPONSE.format(
                                 username=username))
                 elif is_struggling.lower() == "no":
                     is_struggling_correct = True
-                    print(config.bot_message_format + lang.SUGGESTION_STUDENT_DESK)
-                    print(config.bot_message_format + lang.FINAL_ADNOTAION)
+                    print(config.message + lang.SUGGESTION_STUDENT_DESK)
+                    print(config.message + lang.FINAL_ADNOTAION)
                 else:
-                    print(config.bot_message_error_cancel_format + lang.YES_NO_INCORRECT_RESPONSE.format(
+                    print(config.error + lang.YES_NO_INCORRECT_RESPONSE.format(
                         username=username))
-            print(config.bot_message_error_cancel_format + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
+            print(config.error + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
         case "sports":
             if config.DEBUG:
-                print(config.bot_debug_format + "[DEBUG] Category selected: Sports")
+                print(config.debug + "[DEBUG] Category selected: Sports")
             while not has_specific_sport_correct:
-                has_specific_sport: str = input(config.bot_message_format + lang.HAS_SPECIFIC_SPORT)
+                has_specific_sport: str = input(config.message + lang.HAS_SPECIFIC_SPORT)
                 if has_specific_sport.lower() == "yes":
                     has_specific_sport_correct = True
-                    user_sport: str = input(config.bot_message_format + lang.QUESTION_SPECIFIC_SPORT)
+                    user_sport: str = input(config.message + lang.QUESTION_SPECIFIC_SPORT)
                     if user_sport.lower() in data_sports:
-                        print(config.bot_message_format + lang.SUGGESTION_SPORTS_CENTRE)
-                        print(config.bot_message_format + lang.FINAL_ADNOTAION)
+                        print(config.message + lang.SUGGESTION_SPORTS_CENTRE.format(sport=user_sport.capitalize()))
+                        print(config.message + lang.FINAL_ADNOTAION)
                     else:
-                        print(config.bot_message_format + lang.SPORT_NOT_AVAILABLE)
+                        print(config.message + lang.SPORT_NOT_AVAILABLE)
                         for i in data_sports:
                             print(f"  -> {i}")
-                        print(config.bot_message_format + lang.FINAL_ADNOTAION)
+                        print(config.message + lang.FINAL_ADNOTAION)
                 elif has_specific_sport.lower() == "no":
                     has_specific_sport_correct = True
-                    sport_fit: str = input(config.bot_message_format + lang.SPORT_FIT)
+                    sport_fit: str = input(config.message + lang.SPORT_FIT)
                     findBestMatch(formatUserInput(sport_fit), "sports")
                 else:
-                    print(config.bot_message_format + lang.YES_NO_INCORRECT_RESPONSE.format(username=username))
+                    print(config.message + lang.YES_NO_INCORRECT_RESPONSE.format(username=username))
 
-            print(config.bot_message_error_cancel_format + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
+            print(config.error + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
         case "social activities":
             if config.DEBUG:
-                print(config.bot_debug_format + "[DEBUG] Category selected: Activities }")
+                print(config.debug + "[DEBUG] Category selected: Activities }")
             while not user_activities_choice_correct:
-                user_activities_choice: str = input(config.bot_message_format + lang.EVENTS_OR_ASSOCIATIONS)
+                user_activities_choice: str = input(config.message + lang.EVENTS_OR_ASSOCIATIONS)
                 if user_activities_choice.lower() == "events":
                     user_activities_choice_correct = True
                     upcomingEvents(data_events)
                 elif user_activities_choice.lower() == "associations":
                     user_activities_choice_correct = True
-                    association_fit: str = input(config.bot_message_format + lang.ASSOCIATION_FIT)
+                    association_fit: str = input(config.message + lang.ASSOCIATION_FIT)
                     findBestMatch(formatUserInput(association_fit), "associations")
                 else:
-                    print(config.bot_message_error_cancel_format + lang.EVENTS_OR_ASSOCIATIONS_ERROR.format(
+                    print(config.error + lang.EVENTS_OR_ASSOCIATIONS_ERROR.format(
                         username=username))
 
-            print(config.bot_message_error_cancel_format + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
+            print(config.error + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
         case "not found":
-            print(config.bot_message_error_cancel_format + lang.CATEGORY_NOT_DEFINED.format(username=username))
-            print(config.bot_message_error_cancel_format + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
+            print(config.error + lang.CATEGORY_NOT_DEFINED.format(username=username))
+            print(config.error + lang.END_CONVERSATION.format(end_keyword=config.END_KEYWORD))
         case "stop conversation":
-            print(config.bot_message_format + lang.END_MESSAGE.format(username=username))
+            print(config.message + lang.END_MESSAGE.format(username=username))
             conversation_status = False

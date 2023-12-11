@@ -14,8 +14,8 @@ MIN_REQ_SIM_SCORE_FINAL_MATCH: Dict[str, float] = {
 }
 USER_INPUT_BLACKLISTED_SIGNS: List[str] = ["?", "!", ",", "."]
 DEFINE_CATEGORY_CATEGORIES: List[str] = ["studying", "sports", "social activities"]
-bot_message_format = utils.Color.GREEN
-bot_debug_format = utils.Color.RED + utils.Color.BOLD
-bot_message_error_cancel_format = utils.Color.RED
-bot_message_special_format = utils.Color.PURPLE
-bot_message_date_highlight = utils.Color.YELLOW
+message = utils.Color.GREEN  # default bot message format
+debug = utils.Color.RED + utils.Color.BOLD  # debug bot message format
+error = utils.Color.RED  # error / cancel bot message format
+special = utils.Color.PURPLE  # special bot message format
+highlight = utils.Color.YELLOW  # highlight bot message format
