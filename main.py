@@ -83,28 +83,15 @@ def defineCategory(user_input: str) -> str:
         return "stop conversation"
     best_score: float = 0
     best_score_category: str = ""
-    for word in keywords.keywords_sport:
-        seq = difflib.SequenceMatcher(None, user_input.lower(), word.lower())
-        if config.DEBUG:
-            print(config.bot_debug_format + lang.SIMILARITY_SCORE_DEBUG.format(user_input=user_input, word=word,
-                                                                               calc=seq.ratio() * 100))
-        if seq.ratio() * 100 > best_score:
-            best_score = seq.ratio() * 100
-            best_score_category = "sports"
-    for word in keywords.keywords_studying:
-        seq = difflib.SequenceMatcher(None, user_input.lower(), word.lower())
-        if config.DEBUG:
-            print(f"{config.bot_debug_format}[DEBUG] Similarity score ({user_input} / {word} -> {seq.ratio() * 100}")
-        if seq.ratio() * 100 > best_score:
-            best_score = seq.ratio() * 100
-            best_score_category = "studying"
-    for word in keywords.keywords_social_activities:
-        seq = difflib.SequenceMatcher(None, user_input.lower(), word.lower())
-        if config.DEBUG:
-            print(f"{config.bot_debug_format}[DEBUG] Similarity score ({user_input} / {word} -> {seq.ratio() * 100}")
-        if seq.ratio() * 100 > best_score:
-            best_score = seq.ratio() * 100
-            best_score_category = "social activities"
+    for category in config.DEFINE_CATEGORY_CATEGORIES:
+        for word in keywords.categoryMatchKeywords[category]:
+            seq = difflib.SequenceMatcher(None, user_input.lower(), word.lower())
+            if config.DEBUG:
+                print(config.bot_debug_format + lang.SIMILARITY_SCORE_DEBUG.format(user_input=user_input, word=word, calc=seq.ratio() * 100))
+            if seq.ratio() * 100 > best_score:
+                best_score = seq.ratio() * 100
+                best_score_category = category
+
     if best_score > config.MIN_REQUIRED_SIMILARITY_SCORE:
         return best_score_category
     else:
@@ -112,23 +99,23 @@ def defineCategory(user_input: str) -> str:
         return best_score_category
 
 
-def findBestMatch(user_input: str, type: str) -> None:
+def findBestMatch(user_input: str, category: str) -> None:
     user_input_splitted = user_input.split()
     all_scores: Dict[str, float] = {}
     final_suggestions: List[str] = []
 
-    def calcMatchScore(user_input: List[str], type: str, target: str) -> None:
+    def calcMatchScore(user_input: List[str], category: str, target: str) -> None:
         all_words_scores: List[float] = []
         for word in user_input:
             word_score: float = 0
-            for keyword in keywords.match_keywords[type][target]:
+            for keyword in keywords.match_keywords[category][target]:
                 seq = difflib.SequenceMatcher(None, word.lower(), keyword.lower())
                 if config.DEBUG:
                     print(
                         f"{config.bot_debug_format}[DEBUG] Similarity score ({word.lower()} / {keyword.lower()} -> {seq.ratio() * 100}")
                 if seq.ratio() * 100 > word_score:
                     word_score = seq.ratio() * 100
-            if word_score > config.MIN_REQ_SIM_SCORE_MATCH[type]:
+            if word_score > config.MIN_REQ_SIM_SCORE_MATCH[category]:
                 all_words_scores.append(word_score)
         match_score: float = 0
         for score in all_words_scores:
@@ -139,19 +126,20 @@ def findBestMatch(user_input: str, type: str) -> None:
         except:
             all_scores[target] = 0
 
-    for item in keywords.match_keywords[type]:
-        calcMatchScore(user_input_splitted, type, item)
+    for item in keywords.match_keywords[category]:
+        calcMatchScore(user_input_splitted, category, item)
 
     for item in all_scores.items():
-        if item[1] > config.MIN_REQ_SIM_SCORE_FINAL_MATCH[type]:
+        if item[1] > config.MIN_REQ_SIM_SCORE_FINAL_MATCH[category]:
             final_suggestions.append(item[0])
     if len(final_suggestions) > 0:
-        print(f"{config.bot_message_format}{type.capitalize()} we managed to find for you:")
+        print(f"{config.bot_message_format}{category.capitalize()} we managed to find for you:")
         for suggestion in final_suggestions:
-            print(f"{config.bot_message_format}➫ {config.bot_message_special_format}{suggestion}{config.bot_message_format}")
+            print(
+                f"{config.bot_message_format}➫ {config.bot_message_special_format}{suggestion}{config.bot_message_format}")
         print(config.bot_message_format + lang.FINAL_ADNOTAION)
     else:
-        match type:
+        match category:
             case "associations":
                 print(config.bot_message_format + lang.ASSOCIATION_MATCH_NOT_FOUND)
             case "sports":
@@ -190,6 +178,7 @@ for line in formatted_data[1:]:
     data_sports.append(line[0])
     data_associations.append(line[1])
     data_events.append(event_format(line[2]))
+
 print(utils.Color.YELLOW + utils.greeting_title)
 conversation_status: bool = True
 username: str = input(config.bot_message_format + lang.REQUEST_NAME)
